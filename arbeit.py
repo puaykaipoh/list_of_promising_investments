@@ -8,6 +8,9 @@ if __name__=='__main__':
 	end = datetime.utcnow()
 	if len(sys.argv) > 1:
 		end = datetime.strptime(sys.argv[1], '%Y/%m/%d')
+	if end.weekday() in [5,6]:
+		log('INFO', datetime.strftime(end, '%Y/%m/%d')+' is a weekend')
+		return
 	try:
 		from sti_components import STIComponents
 		interested_equities = STIComponents().get()
