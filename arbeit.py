@@ -6,7 +6,7 @@ from mlogging import log
 if __name__=='__main__':
 	log('INFO', '***Start')
 	end = datetime.utcnow()
-	if len(sys.argv) > 0:
+	if len(sys.argv) > 1:
 		end = datetime.strptime(sys.argv[1], '%Y/%m/%d')
 	try:
 		from sti_components import STIComponents
