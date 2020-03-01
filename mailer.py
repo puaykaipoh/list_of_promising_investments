@@ -20,7 +20,7 @@ class Mailer():
 			from sendgrid.helpers.mail import Mail
 			message = Mail(
 				from_email=from_add,
-				to_emails=', '.join(to_adds),
+				to_emails=to_adds,
 				subject=subject,
 				html_content=content)
 			response = self.service.send(message)

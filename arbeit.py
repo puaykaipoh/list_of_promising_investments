@@ -25,8 +25,8 @@ if __name__=='__main__':
 		if len(sys.argv) == 1:
 			from mailer import Mailer
 			mfunction = Mailer().send_mail
-			margs = [["puaykaipoh@gmail.com"], 
-				"donotreply@arbeit.com", 
+			margs = [["puaykaipoh@gmail.com", "charissatanweiyi@gmail.com"], 
+				"kai@arbeit.com", 
 				"STI Analysis Report "+datetime.strftime(datetime.utcnow(), "%Y %b %d"), 
 				content]
 		else:
