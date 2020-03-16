@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from html.parser import HTMLParser
 from json import loads
 from time import mktime
 from urllib.parse import urlencode
@@ -9,6 +10,7 @@ from mlogging import log
 
 class Ticker():
 	BASE_URL = 'https://query1.finance.yahoo.com'
+	SCRAPE_URL = 'https://finance.yahoo.com/quote'
 	NUMBER_OF_RETRY_CALLS = 8
 
 	def __init__(self, ticker):
@@ -81,7 +83,45 @@ class Ticker():
 		self.json_data = self._call_url({"period1":start, "period2":end, "interval":'1d', "includePrePost":True, "events":"div,splits"})
 		return self._read_datum()
 
+	def get_financial_data(self):
+		url = '{}/{}/financials'.format(self.SCRAPE_URL, self.ticker)
+		req = urlopen(url)
+		financial_parser = FinancialParser()
+		financial_parser.feed(req.read().decode())
+		return financial_parser.datum
+
+
+class FinancialParser(HTMLParser): #https://finance.yahoo.com/quote/Z74.SI/financials?p=Z74.SI
+	IN_HEADER_ROW = False
+	IN_HEADER_CELL = False
+	GET_HEADER_DATA = False
+	GET_COLUMN_HEADER_DATA = False
+	IN_DATA_TABLE = False
+
+	def handle_starttag(self, tag, attrs):
+		attrs = dict(attrs)
+		if tag == 'div':
+			if 'D(tbhg)' in attrs.get('class', []):
+				self.IN_HEADER_ROW = True
+			elif self.IN_HEADER_ROW and 'D(ib)' in attrs.get('class',[]):
+				self.IN_HEADER_CELL = True
+		elif tag == 'span' and 'Va(m)' in attrs.get('class', []):
+			self.GET_COLUMN_HEADER_DATA = True
+		elif self.IN_HEADER_CELL and tag=='span':
+			self.GET_HEADER_DATA = True
+
+
+	def handle_endtag(self, tag):
+		pass
+
+	def handle_data(self, data):
+		if self.GET_HEADER_DATA:
+			print('ROW HEADER', data)
+			self.GET_HEADER_DATA = False
+		elif self.GET_COLUMN_HEADER_DATA:
+			print('COLUMN HEADER', data)
+			self.GET_COLUMN_HEADER_DATA = False
 
 if __name__ == "__main__":
 	ticker = Ticker('Z74.SI')
-	print(ticker.get_n_year_data())
+	print(ticker.get_financial_data())
