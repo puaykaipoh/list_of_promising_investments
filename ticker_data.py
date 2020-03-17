@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from json import loads
+import locale
 from time import mktime
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -84,44 +85,77 @@ class Ticker():
 		return self._read_datum()
 
 	def get_financial_data(self):
+		locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 		url = '{}/{}/financials'.format(self.SCRAPE_URL, self.ticker)
 		req = urlopen(url)
 		financial_parser = FinancialParser()
 		financial_parser.feed(req.read().decode())
+		#return financial_parser.datum
 		return financial_parser.datum
 
 
 class FinancialParser(HTMLParser): #https://finance.yahoo.com/quote/Z74.SI/financials?p=Z74.SI
-	IN_HEADER_ROW = False
-	IN_HEADER_CELL = False
-	GET_HEADER_DATA = False
-	GET_COLUMN_HEADER_DATA = False
-	IN_DATA_TABLE = False
+	IN_TABLE = False
+	IN_ROW = False
+	GET_DATA = False
+	IN_TABLE_DIV_COUNT = 1
+	ROW_DIV_COUNT = 0
+	ROW_INDEX = 0
+	CELL_INDEX = 0
+	HEADERS = {}
+	CURRENT_ROW_HEADER = None
+	datum = {}
 
 	def handle_starttag(self, tag, attrs):
 		attrs = dict(attrs)
-		if tag == 'div':
-			if 'D(tbhg)' in attrs.get('class', []):
-				self.IN_HEADER_ROW = True
-			elif self.IN_HEADER_ROW and 'D(ib)' in attrs.get('class',[]):
-				self.IN_HEADER_CELL = True
-		elif tag == 'span' and 'Va(m)' in attrs.get('class', []):
-			self.GET_COLUMN_HEADER_DATA = True
-		elif self.IN_HEADER_CELL and tag=='span':
-			self.GET_HEADER_DATA = True
+		if self.IN_TABLE:
+			if tag == 'div':
+				self.IN_TABLE_DIV_COUNT +=1
+				if self.IN_ROW:
+					self.ROW_DIV_COUNT += 1
+			if "D(tbr)" in attrs.get('class', []):
+				self.IN_ROW = True
+				self.ROW_INDEX += 1
+				self.ROW_DIV_COUNT += 1
+			elif self.IN_ROW and (("D(ib)" in attrs.get('class', [])) or ("D(tbc)" in attrs.get('class', []))):
+				self.GET_DATA = True
+		elif "M(0) Whs(n) BdEnd Bdc($seperatorColor) D(itb)" in attrs.get('class', []):
+			self.IN_TABLE = True
 
 
 	def handle_endtag(self, tag):
-		pass
+		if self.IN_TABLE and tag == 'div':
+			self.IN_TABLE_DIV_COUNT -= 1
+			if self.IN_TABLE_DIV_COUNT == 0:
+				self.IN_TABLE = False
+			if self.IN_ROW:
+				self.ROW_DIV_COUNT -= 1
+				if self.ROW_DIV_COUNT == 0:
+					self.IN_ROW = False
+					self.CELL_INDEX = 0
+					# print('found end row')
 
 	def handle_data(self, data):
-		if self.GET_HEADER_DATA:
-			print('ROW HEADER', data)
-			self.GET_HEADER_DATA = False
-		elif self.GET_COLUMN_HEADER_DATA:
-			print('COLUMN HEADER', data)
-			self.GET_COLUMN_HEADER_DATA = False
+		if self.IN_TABLE and self.GET_DATA and len(data)<=128:
+			# print(self.ROW_INDEX, self.CELL_INDEX, data)
+			if self.ROW_INDEX == 1:
+				self.HEADERS[self.CELL_INDEX] = data
+			else:
+				if self.CELL_INDEX == 0:
+					self.CURRENT_ROW_HEADER = data
+				else:
+					existing = self.datum.get(self.HEADERS[self.CELL_INDEX], {})
+					try:
+						num = locale.atoi(data)
+					except:
+						num = None
+					existing[self.CURRENT_ROW_HEADER] = num
+					self.datum[self.HEADERS[self.CELL_INDEX]] = existing
+			self.CELL_INDEX += 1
 
 if __name__ == "__main__":
 	ticker = Ticker('Z74.SI')
-	print(ticker.get_financial_data())
+	financial_data = ticker.get_financial_data()
+	import pprint
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(financial_data)
