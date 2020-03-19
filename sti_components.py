@@ -41,4 +41,6 @@ class STIComponents():
 if __name__=='__main__':
 	data = STIComponents().get()
 	print(len(data))
-	print(data)
+	import pprint
+	pp = pprint.PrettyPrinter(indent=4)
+	pp.pprint(data)
