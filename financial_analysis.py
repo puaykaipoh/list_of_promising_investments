@@ -17,6 +17,8 @@ class Analyst():
 			stats.append((component['symbol'], self._flatten_dict(ticker.get_statistics_data())))
 			log('INFO', 'converted '+str(i)+'/'+str(len(components)))
 		key_symbol_value_rank = []
+		row_count = {}
+		max_number_of_row_header = 0
 		for key, value in stats[0][1].items():#key: [ 'Trading information','Stock price history', 'Beta (5Y monthly)']
 			symbol_value_tuples = []
 			missing_one = False
@@ -29,9 +31,23 @@ class Analyst():
 					symbol_value_tuples.append((symbol, self._try_convert_to_num(value_string), value_string))
 			#sort by value_string
 			if not missing_one:
+				max_number_of_row_header = max(len(key), max_number_of_row_header)
+				for index, item in enumerate(key):
+					if (index, item) in row_count:
+						row_count[(index, item)] += 1
+					else:
+						row_count[(index, item)] = 1
 				for rank, (symbol, v, value_string) in sorted(symbol_value_tuples, key=lambda x: x[1]):
 					key_symbol_value_rank.append((key, symbol, value_string, rank))
-		#TODO need to count each key how many rows it occupy
+
+		#TODO need to produce the table, list of list of tuple (item, how_many_rows, how_many_columns)
+		table = []
+		header = [("", 1, max_number_of_row_header)]
+		for component in components:
+			header.append((component['name']+' ('+component['symbol']+')', 1, 1))
+		table.append(header)
+		
+
 	
 	def _flatten_dict(self, stats_data):
 		#stats_data is a dictionary of dictionary whose leaves are strings
