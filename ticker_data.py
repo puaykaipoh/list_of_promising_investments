@@ -112,13 +112,13 @@ class Ticker():
 				"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
 			}
 		)
-		print(url)
+		#print(url)
 		req = urlopen(url)
 		content = req.read().decode()
 		################
-		file = open('D:\\random\\list_of_promising_investments\\test\\sample.html', 'w')
-		file.write(content)
-		file.close()
+		#file = open('D:\\random\\list_of_promising_investments\\test\\sample.html', 'w')
+		#file.write(content)
+		#file.close()
 		################
 		statistics_parser = StatisticsParser()
 		statistics_parser.feed(content)
