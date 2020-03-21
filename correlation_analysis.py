@@ -12,7 +12,7 @@ class Analyst():
 		log('INFO', 'Getting correlation time series')
 		for i, component in enumerate(components):
 			ticker = Ticker(component['symbol'])
-			log('INFO', 'correlation time series for '+component['symbol']+' '+str(i)+'/'+str(len(components)))
+			log('INFO', 'correlation time series for '+component['symbol']+' '+str(i+1)+'/'+str(len(components)))
 			self.yearly_datum[component['symbol']] = list(map(lambda d: {
 				'datetime':d['datetime'], 
 				'value':d['close']}, ticker.get_daily_year_data(end)))
@@ -66,6 +66,11 @@ class Analyst():
 
 if __name__=='__main__':
 	from sti_components import STIComponents
-	components = STIComponents().get()
 	from datetime import datetime, timedelta
-	print(Analyst(components, datetime.utcnow() - timedelta(days=1)).get())
+	components = STIComponents().get()
+	datum = Analyst(components, datetime.utcnow() ).get()
+	from formater import Formater
+	content = Formater()._correlation(datum)
+	from filer import Filer
+	Filer().file(content)
+	

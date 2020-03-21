@@ -7,8 +7,8 @@ class Analyst():
 	datum = {'high':[], 'low':[]}
 
 	def __init__(self, components, end):
-		if datetime.utcnow().weekday() in [5, 6]: #TODO this seems to be redundant code
-			raise Exception('Its a week end')
+		#if datetime.utcnow().weekday() in [5, 6]: #TODO this seems to be redundant code
+		#	raise Exception('Its a week end')
 		for i, dictionary in enumerate(components):
 			log('INFO', dictionary['symbol']+' '+str(i+1)+'/'+str(len(components)))
 			low_d, high_d = self._calculate_closeness(dictionary, end)

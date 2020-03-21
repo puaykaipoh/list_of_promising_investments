@@ -20,8 +20,11 @@ if __name__=='__main__':
 		from correlation_analysis import Analyst as CR_Analyst
 		correlation_datum = CR_Analyst(interested_equities, end).get()
 		log('INFO', 'Finished CR analysis')
+		from financial_analysis import Analyst as FS_Analyst
+		financial_stats_datum = FS_Analyst(interested_equities).get()
+		log('INFO', 'Finished FS analysis')
 		from formater import Formater
-		content = Formater().daily_mail(hl_datum, correlation_datum)
+		content = Formater().daily_mail(hl_datum, correlation_datum, financial_stats_datum)
 		if len(sys.argv) == 1:
 			from mailer import Mailer
 			mfunction = Mailer().send_mail

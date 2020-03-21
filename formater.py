@@ -60,8 +60,7 @@ class Formater():
 		elif -0.9 > num and num >= -1:
 			return '#ff0000'
 
-
-	def daily_mail(self, hl_datum, correlation_datum):
+	def _low_table(self, hl_datum):
 		low = """<table style="border-collapse:collapse">
 			<thead><tr style="background-color:#0099ff"><th></th>"""
 		low += """<th>Name</th>"""
@@ -86,7 +85,9 @@ class Formater():
 			low += """</tr>"""
 		low += """</tbody>
 		</table>"""
+		return low
 
+	def _high_table(self, hl_datum):
 		high = """<table style="border-collapse:collapse">
 			<thead><tr style="background-color:#0099ff"><th></th>"""
 		high += """<th>Name</th>"""
@@ -111,7 +112,9 @@ class Formater():
 			high += """</tr>"""
 		high += """</tbody>
 		</table>"""
+		return high
 
+	def _low_historical(self, hl_datum):
 		values_display_name = {'day':'Day', '1_year':'1 Year', '2_year':'2 Year', '5_year':'5 Year'}
 		low_historical = """<table style="border-collapse:collapse">
 			<thead></thead>"""
@@ -140,7 +143,10 @@ class Formater():
 				low_historical += """</tr>"""
 		low_historical +="""</tbody>
 		</table>"""
+		return low_historical
 
+	def _high_historical(self, hl_datum):
+		values_display_name = {'day':'Day', '1_year':'1 Year', '2_year':'2 Year', '5_year':'5 Year'}
 		high_historical = """<table style="border-collapse:collapse">
 			<thead></thead>"""
 		high_historical += """<tbody>"""
@@ -168,7 +174,9 @@ class Formater():
 				high_historical += """</tr>"""
 		high_historical +="""</tbody>
 		</table>"""
+		return high_historical
 
+	def _correlation(self, correlation_datum):
 		correlation = """<table style="border-collapse:collapse">
 			<thead></thead><tbody><tr><td></td>"""
 		header_keys = list(map(lambda d: (d[0][0], d[0][1]), correlation_datum[0][2].items()))
@@ -186,13 +194,36 @@ class Formater():
 					break
 			correlation += """</tr>"""
 		correlation += """</tbody></table>"""
+		return correlation
 
+	def _financial_stats(self, financial_stats_datum):
+		financial_stats = """<table border="1"><thead><tr>"""
+		for (content, rowspan, colspan) in financial_stats_datum.pop(0): # first row is header
+			financial_stats += '<th rowspan="{}" colspan="{}">{}</th>'.format(rowspan, colspan, content)
+		financial_stats += """</tr></thead><tbody>"""
+		for row in financial_stats_datum:
+			financial_stats += '<tr>'
+			for (content, rowspan, colspan) in row:
+				financial_stats += '<th rowspan="{}" colspan="{}">{}</th>'.format(rowspan, colspan, content)
+			financial_stats += '</tr>'
+		financial_stats += """</tbody></table>"""
+		return financial_stats
+
+	def daily_mail(self, hl_datum, correlation_datum, financial_stats_datum):
+		low = self._low_table(hl_datum)
+		high = self._high_table(hl_datum)
+		low_historical = self._low_historical(hl_datum)
+		high_historical = self._high_historical(hl_datum)
+		correlation = self._correlation(correlation_datum)
+		financial_stats = self._financial_stats(financial_stats_datum)
 		html = """<table>
 			<thead></thead>
 			<tbody>
 				<tr><td style='font-weight:800;font-size:22px'>Low</td></tr>
 				<tr><td>{}</td></tr>
 				<tr><td style='font-weight:800;font-size:22px'>High</td></tr>
+				<tr><td>{}</td></tr>
+				<tr><td style='font-weight:800;font-size:22px'>Financial Stats</td></tr>
 				<tr><td>{}</td></tr>
 				<tr><td style='font-weight:800;font-size:22px'>Historical Low</td></tr>
 				<tr><td>{}</td></tr>
@@ -201,5 +232,5 @@ class Formater():
 				<tr><td style='font-weight:800;font-size:22px'>Correlation</td></tr>
 				<tr><td>{}</td></tr>
 			</tbody>
-		</table>""".format(low, high, low_historical, high_historical, correlation)
+		</table>""".format(low, high, financial_stats, low_historical, high_historical, correlation)
 		return html
