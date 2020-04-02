@@ -2,7 +2,8 @@ from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from json import loads
 import locale
-from time import mktime
+from time import mktime, sleep
+import random
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request
 
@@ -24,6 +25,7 @@ class Ticker():
 		counter = 0
 		while counter < self.NUMBER_OF_RETRY_CALLS:
 			try:
+				sleep(3*(random.random()+2))
 				#req = urlopen(url)
 				request = Request(
 					url,
