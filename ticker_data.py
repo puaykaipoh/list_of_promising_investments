@@ -264,6 +264,7 @@ class StatisticsParser(HTMLParser):
 
 
 if __name__ == "__main__":
+	#https://query1.finance.yahoo.com/v8/finance/chart/Z74.SI?period1=1582435961&period2=1582522361&interval=1d&includePrePost=True&events=div%2Csplits
 	ticker = Ticker('Z74.SI')
 	financial_data = ticker.get_statistics_data()#ticker.get_financial_data()
 	import pprint

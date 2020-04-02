@@ -45,15 +45,19 @@ class Analyst():
 		ticker = Ticker(dictionary['symbol'])
 		day_data = ticker.get_day_data(start=None, end=end)
 		if day_data == None:
+			log('ERROR', 'did not get day data')
 			return None, None
 		one_year_data = ticker.get_n_year_data(n=1, end=end)
 		if one_year_data == None:
+			log('ERROR', 'did not get 1 year data')
 			return None, None
 		two_year_data = ticker.get_n_year_data(n=2, end=end)
 		if two_year_data == None:
+			log('ERROR', 'did not get 2 year data')
 			return None, None
 		five_year_data = ticker.get_n_year_data(n=5, end=end)
 		if five_year_data == None:
+			log('ERROR', 'did not get 5 year data')
 			return None, None
 		low_d = dict(dictionary)
 		high_d = dict(dictionary)
