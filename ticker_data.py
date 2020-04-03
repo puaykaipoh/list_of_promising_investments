@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import gzip
 from html.parser import HTMLParser
 from json import loads
 import locale
@@ -49,6 +50,11 @@ class Ticker():
 				import traceback
 				log('ERROR', '_call_url retry times '+str(counter+1)+' error:'+traceback.format_exc())
 		data = req.read()
+		#print(str(req.info().get('Content-Encoding')))
+		try:
+			data = gzip.decompress(data)
+		except:
+			log('INFO', 'cannot decompress, type: '+str(req.info().get('Content-Encoding')))
 		return loads(data)
 
 	def _read_data(self): # gets point data
