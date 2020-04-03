@@ -121,7 +121,7 @@ class Ticker():
 	def get_statistics_data(self):
 		locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 		url = '{}/{}/key-statistics'.format(self.SG_SCRAPE_URL, self.ticker)
-		req = Request(
+		request = Request(
 			url,
 			data=None,
 			headers={
@@ -137,15 +137,21 @@ class Ticker():
 			}
 		)
 		#print(url)
-		req = urlopen(url)
-		content = req.read().decode()
+
+		sleep(3*(random.random()+2))
+		req = urlopen(request)
+		data = req.read()
 		################
 		#file = open('D:\\random\\list_of_promising_investments\\test\\sample.html', 'w')
 		#file.write(content)
 		#file.close()
 		################
+		try:
+			data = gzip.decompress(data)
+		except:
+			log('INFO', 'get stats cannot decompress, type: '+str(req.info().get('Content-Encoding')))
 		statistics_parser = StatisticsParser()
-		statistics_parser.feed(content)
+		statistics_parser.feed(data)
 		statistics = statistics_parser.datum
 		#print(statistics)
 		return statistics
