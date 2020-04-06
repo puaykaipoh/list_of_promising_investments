@@ -136,10 +136,11 @@ class Ticker():
 				"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
 			}
 		)
-		#print(url)
+		print(url)
 
 		sleep(3*(random.random()+2))
-		req = urlopen(request)
+		#req = urlopen(request)
+		req = urlopen(url)
 		data = req.read()
 		################
 		#file = open('D:\\random\\list_of_promising_investments\\test\\sample.html', 'w')
@@ -147,9 +148,11 @@ class Ticker():
 		#file.close()
 		################
 		try:
-			data = gzip.decompress(data)
+			data = gzip.decompress(data).decode()
+			#print(data)
 		except:
 			log('INFO', 'get stats cannot decompress, type: '+str(req.info().get('Content-Encoding')))
+			data = data.decode()
 		statistics_parser = StatisticsParser()
 		statistics_parser.feed(data)
 		statistics = statistics_parser.datum
