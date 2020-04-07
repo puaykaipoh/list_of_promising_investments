@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import gzip
 from html.parser import HTMLParser
@@ -26,7 +27,7 @@ class Ticker():
 		counter = 0
 		while counter < self.NUMBER_OF_RETRY_CALLS:
 			try:
-				sleep(3*(random.random()+2))
+				sleep(3*(random.random()+1.5))
 				#req = urlopen(url)
 				request = Request(
 					url,
@@ -138,26 +139,48 @@ class Ticker():
 		)
 		print(url)
 
-		sleep(3*(random.random()+2))
-		#req = urlopen(request)
-		req = urlopen(url)
+		sleep(3*(random.random()+1.5))
+		req = urlopen(request)
+		#req = urlopen(url)
 		data = req.read()
-		################
-		#file = open('D:\\random\\list_of_promising_investments\\test\\sample.html', 'w')
-		#file.write(content)
-		#file.close()
-		################
 		try:
-			data = gzip.decompress(data).decode()
+			data = gzip.decompress(data)
+			statistics = self.parse_stats(data)
 			#print(data)
 		except:
 			log('INFO', 'get stats cannot decompress, type: '+str(req.info().get('Content-Encoding')))
 			data = data.decode()
-		statistics_parser = StatisticsParser()
-		statistics_parser.feed(data)
-		statistics = statistics_parser.datum
+			statistics_parser = StatisticsParser()
+			statistics_parser.feed(data)
+			statistics = statistics_parser.datum
+		################
+		#file = open('D:\\random\\list_of_promising_investments\\test\\sample.html', 'wb')
+		#file.write(data)
+		#file.close()
+		################
 		#print(statistics)
 		return statistics
+
+	def parse_stats(self, content):
+		dictionary = {}
+		soup = BeautifulSoup(content, 'html.parser')
+		for lg_table in soup.findAll("div", {"class":lambda x: x and 'Fl(' in x and 'smartphone_W(100%)' in x and 'W(50%)' in x}):
+			title = lg_table.findAll('h2')[0].findAll('span')[0].text
+			dictionary[title] = {}
+			if 'valuation' in title.lower():
+				for row in lg_table.findAll("tr"):
+					cells = row.findAll("td")
+					dictionary[title][cells[0].text] = cells[1].text
+			else:
+				for sm_table in lg_table.findAll("div", {"class":lambda x: x and "Pos(r)" in x and "Mt(10px)" in x}):
+					sm_title = sm_table.findAll('h3')[0].findAll('span')[0].text
+					dictionary[title][sm_title] = {}
+					for row in sm_table.findAll("tr"):
+						cells = row.findAll("td")
+						dictionary[title][sm_title][cells[0].text] = cells[1].text
+		return dictionary
+
+
 
 
 class FinancialParser(HTMLParser): #https://finance.yahoo.com/quote/Z74.SI/financials?p=Z74.SI
@@ -303,3 +326,8 @@ if __name__ == "__main__":
 	import pprint
 	pp = pprint.PrettyPrinter(indent=4)
 	pp.pprint(financial_data)
+	#file = open('D:\\random\\list_of_promising_investments\\test\\sample.html', 'rb')
+	#dictionary = ticker.parse_stats(file.read())
+	#import pprint
+	#pp = pprint.PrettyPrinter(indent=4)
+	#pp.pprint(dictionary)
