@@ -50,6 +50,7 @@ class Ticker():
 				counter += 1
 				import traceback
 				log('ERROR', '_call_url retry times '+str(counter+1)+' error:'+traceback.format_exc())
+				sleep(3*(random.random()+1.5))
 		data = req.read()
 		#print(str(req.info().get('Content-Encoding')))
 		try:
@@ -122,25 +123,34 @@ class Ticker():
 	def get_statistics_data(self):
 		locale.setlocale(locale.LC_ALL, 'en_US.UTF8')
 		url = '{}/{}/key-statistics'.format(self.SG_SCRAPE_URL, self.ticker)
-		request = Request(
-			url,
-			data=None,
-			headers={
-				"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-				"accept-encoding":"gzip, deflate, br",
-				"accept-language":"en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7",
-				"sec-fetch-dest":"document",
-				"sec-fetch-mode":"navigate",
-				"sec-fetch-site":"none",
-				"sec-fetch-user":"?1",
-				"upgrade-insecure-requests":"1",
-				"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
-			}
-		)
-		print(url)
+		counter = 0
+		while counter < self.NUMBER_OF_RETRY_CALLS:
+			try:
+				sleep(3*(random.random()+1.5))
+				print(url)
 
-		sleep(3*(random.random()+1.5))
-		req = urlopen(request)
+				request = Request(
+					url,
+					data=None,
+					headers={
+						"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+						"accept-encoding":"gzip, deflate, br",
+						"accept-language":"en-US,en;q=0.9,zh-TW;q=0.8,zh;q=0.7",
+						"sec-fetch-dest":"document",
+						"sec-fetch-mode":"navigate",
+						"sec-fetch-site":"none",
+						"sec-fetch-user":"?1",
+						"upgrade-insecure-requests":"1",
+						"user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"
+					}
+				)
+				req = urlopen(request)
+			except:
+				counter += 1
+				import traceback
+				log('ERROR', 'get_statistics_data retry times '+str(counter+1)+' error:'+traceback.format_exc())
+				sleep(3*(random.random()+1.5))
+				
 		#req = urlopen(url)
 		data = req.read()
 		try:
