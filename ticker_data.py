@@ -145,12 +145,13 @@ class Ticker():
 					}
 				)
 				req = urlopen(request)
+				counter = self.NUMBER_OF_RETRY_CALLS
 			except:
 				counter += 1
 				import traceback
 				log('ERROR', 'get_statistics_data retry times '+str(counter+1)+' error:'+traceback.format_exc())
 				sleep(3*(random.random()+1.5))
-				
+
 		#req = urlopen(url)
 		data = req.read()
 		try:
