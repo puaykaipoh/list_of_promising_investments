@@ -18,28 +18,28 @@ class Analyst():
 			self.datum['low'].append(low_d)
 		self.datum['high'].sort(key=lambda d:(100*100*d['5_year'])+(100*d['2_year'])+(d['1_year']))
 		self.datum['low'].sort(key=lambda d:(100*100*d['5_year'])+(100*d['2_year'])+(d['1_year']))
-		historical = {'high':{}, 'low':{}}
-		log('INFO', 'HISTORICAL*********************')
-		for i, dictionary in enumerate(components):
-			number_of_days_of_data_needed = 10
-			current_date = end
-			ticker = Ticker(dictionary['symbol'])
-			key = (dictionary['symbol'], dictionary['name'])
-			historical['high'][key] = []
-			historical['low'][key] = []
-			while number_of_days_of_data_needed > 0:
-				current_date = current_date - timedelta(days=1)
-				if current_date.weekday() in [5, 6]:
-					continue
-				low_d, high_d = self._calculate_closeness(dictionary, end=current_date)
-				if low_d is not None and high_d is not None:
-					log('INFO', dictionary['symbol']+' '+datetime.strftime(current_date, '%Y-%m-%d')+' '+str(number_of_days_of_data_needed)+ ' '+str(i+1)+'/'+str(len(components)))
-					low_d['current_date'] = current_date
-					high_d['current_date'] = current_date
-					historical['high'][key].append(high_d)
-					historical['low'][key].append(low_d)
-					number_of_days_of_data_needed -= 1
-		self.datum['historical'] = historical
+		# historical = {'high':{}, 'low':{}}
+		# log('INFO', 'HISTORICAL*********************')
+		# for i, dictionary in enumerate(components):
+		# 	number_of_days_of_data_needed = 10
+		# 	current_date = end
+		# 	ticker = Ticker(dictionary['symbol'])
+		# 	key = (dictionary['symbol'], dictionary['name'])
+		# 	historical['high'][key] = []
+		# 	historical['low'][key] = []
+		# 	while number_of_days_of_data_needed > 0:
+		# 		current_date = current_date - timedelta(days=1)
+		# 		if current_date.weekday() in [5, 6]:
+		# 			continue
+		# 		low_d, high_d = self._calculate_closeness(dictionary, end=current_date)
+		# 		if low_d is not None and high_d is not None:
+		# 			log('INFO', dictionary['symbol']+' '+datetime.strftime(current_date, '%Y-%m-%d')+' '+str(number_of_days_of_data_needed)+ ' '+str(i+1)+'/'+str(len(components)))
+		# 			low_d['current_date'] = current_date
+		# 			high_d['current_date'] = current_date
+		# 			historical['high'][key].append(high_d)
+		# 			historical['low'][key].append(low_d)
+		# 			number_of_days_of_data_needed -= 1
+		# self.datum['historical'] = historical
 
 	def _calculate_closeness(self, dictionary, end=None):
 		ticker = Ticker(dictionary['symbol'])

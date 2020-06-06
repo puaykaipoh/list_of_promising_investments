@@ -2,6 +2,11 @@ beautifulsoup4==4.9.0
 h2==2.6.2
 hpack==3.0.0
 hyperframe==3.2.0
+joblib==0.15.1
+numpy==1.18.5
 python-http-client==3.2.5
+scikit-learn==0.23.1
+scipy==1.4.1
 sendgrid==6.1.2
 soupsieve==2.0
+threadpoolctl==2.1.0
