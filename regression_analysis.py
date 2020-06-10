@@ -52,6 +52,8 @@ class Analyst():
   def _segmented_least_squares(self, X, Y, Cfactor):
     #https://github.com/solohikertoo/segmented-least-squares/blob/master/segleastsquares.py
     #datum = np.array([[0, 0], [1, 1], [2, 2]])
+    X = np.nan_to_num(X)
+    Y = np.nan_to_num(Y)
     n = X.size
     preresult = self._precompute(n, X, Y)
     C = self._penalty(Y, Cfactor)
