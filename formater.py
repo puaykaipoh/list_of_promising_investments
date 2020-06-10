@@ -212,8 +212,8 @@ class Formater():
   def _segmented_linear_regression(self, segmented_datum):
     segmented = """<table border="1"><thead><tr>"""
     segmented += """</tr></thead><tbody>"""
-    for ticker, datum in segmented_datum.items():
-      segmented += '<tr><td>'+ticker+'</td><td>'
+    for (ticker, name), datum in segmented_datum.items():
+      segmented += '<tr><td>'+name+' ('+ticker+')</td><td>'
       segmented += '<table border="1"><thead></tr><td>Overall</td>'
       for i in range(0,len(datum['segments'])):
         segmented += '<td>Trend '+str(i)+'</td>'

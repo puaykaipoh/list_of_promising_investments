@@ -57,7 +57,7 @@ class Analyst():
         })
         #longer the trend the stronger, the later the stronger, the smaller the error the stronger the trend, percentage slope gives the sign and strength of trend
         overall_trend += ((x_end - x_start) * x_end * (1/error) * (coef[0]/abs(intercept)))/1000000
-      self.monthly_datum[component['symbol']] = {"segments":segments, 'overall_trend':overall_trend}
+      self.monthly_datum[(component['symbol'], component['name'])] = {"segments":segments, 'overall_trend':overall_trend}
     self.datum = self.monthly_datum
 
   def get(self):
