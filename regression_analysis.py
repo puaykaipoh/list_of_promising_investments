@@ -22,13 +22,27 @@ class Analyst():
       ticker_datum = ticker.get_hourly_month_data(end)
       segments = []
       overall_trend = 0
-      for x_start, x_end, y_start, y_end, coef, intercept, error in self._segmented_least_squares(
-        np.array(list(map(lambda d: 
+      X = np.array(list(map(lambda d: 
           mktime(d['datetime'].timetuple())
-        ,ticker_datum))),
-        np.array(list(map(lambda d: 
+        ,ticker_datum)))
+      Y = np.array(list(map(lambda d: 
           d['close']
-        ,ticker_datum))),
+        ,ticker_datum)))
+      #start remove all the None
+      prev = X[0] #
+      for i in range(1, len(X)):
+        if X[i] == None:
+          X[i] = prev
+        else:
+          prev = X[i]
+      prev = Y[0]
+      for i in range(1, len(Y)):
+        if Y[i] == None:
+          Y[i] = prev
+        else:
+          prev = Y[i]
+      #end remove ll the None
+      for x_start, x_end, y_start, y_end, coef, intercept, error in self._segmented_least_squares(X, Y,
         0.0078125 # TODO this should be configurable; 0.25=2 segments; 0.0078125 = 3 segments for 4 jun 2020 singtel
       ):
         segments.append({
@@ -52,20 +66,51 @@ class Analyst():
   def _segmented_least_squares(self, X, Y, Cfactor):
     #https://github.com/solohikertoo/segmented-least-squares/blob/master/segleastsquares.py
     #datum = np.array([[0, 0], [1, 1], [2, 2]])
-    X = np.nan_to_num(X)
-    Y = np.nan_to_num(Y)
-    n = X.size
-    preresult = self._precompute(n, X, Y)
-    C = self._penalty(Y, Cfactor)
-    opt = self._findopt(n, preresult, C)
-    yfit = self._construct_fit(n, X, Y, preresult, opt)
-    return yfit
+    try:
+      X = np.nan_to_num(X)
+      Y = np.nan_to_num(Y)
+      ##############TODO debugging
+      # if np.isnan(X).any() or np.isinf(X).any():
+      #   print('_segmented_least_squares X', X)
+      # if np.isnan(Y).any() or np.isinf(Y).any():
+      #   print('_segmented_least_squares Y', Y)
+      #############TODO debugging
+      n = X.size
+      preresult = self._precompute(n, X, Y)
+      C = self._penalty(Y, Cfactor)
+      opt = self._findopt(n, preresult, C)
+      yfit = self._construct_fit(n, X, Y, preresult, opt)
+      return yfit
+    except:
+      import traceback
+      traceback.print_exc()
+      print('***************')
+      print('_segmented_least_squares X', X)
+      print('_segmented_least_squares Y', Y)
+
 
   def _least_squares(self, X, Y):
-    X_p = np.array(list(map(lambda x: [x], X)))
-    regression_model = LinearRegression().fit(X_p, Y)
-    pred_Y = regression_model.predict(X_p)
-    return (regression_model.coef_, regression_model.intercept_, mean_squared_error(Y, pred_Y))
+    try:
+      X_p = np.array(list(map(lambda x: [x], X)))
+      X_p = np.nan_to_num(X_p)
+      Y = np.nan_to_num(Y)
+      ##################################
+      # if np.isnan(X_p).any() or np.isinf(X_p).any():
+      #   print('_least_squares X_p', X_p)
+      # if np.isnan(Y).any() or np.isinf(Y).any():
+      #   print('_least_squares Y', Y)
+      ##################################
+      regression_model = LinearRegression().fit(X_p, Y)
+      pred_Y = regression_model.predict(X_p)
+      pred_Y = np.nan_to_num(pred_Y)
+      return (regression_model.coef_, regression_model.intercept_, mean_squared_error(Y, pred_Y))
+    except:
+      import traceback
+      traceback.print_exc()
+      print('!!!!!!!!!!!!!!!!!!!!')
+      print('_least_squares X', X)
+      print('_least_squares Y', Y)
+
 
   def _precompute(self, n, X, Y):
     result = []
@@ -120,7 +165,7 @@ class Analyst():
 
 if __name__=='__main__':
   from datetime import datetime
-  datum = Analyst([{'symbol':'Z74.SI'}], datetime(2020, 4, 4)).get()
+  datum = Analyst([{'symbol':'C31.SI'}], datetime(2020, 4, 4)).get()
   import pprint
   pp = pprint.PrettyPrinter(indent=4)
   pp.pprint(datum)

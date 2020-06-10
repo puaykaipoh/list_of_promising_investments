@@ -16,9 +16,10 @@ if __name__=='__main__':
     interested_equities = STIComponents().get()
     if len(sys.argv) > 1:#use a smaller set of equities for testing
       interested_equities = [
-        {'name':'Singapore Telecommunications Limited', 'symbol':'Z74.SI'},
+        #{'name':'Singapore Telecommunications Limited', 'symbol':'Z74.SI'},
         {'name':'Oversea-Chinese Banking Corporation Limited', 'symbol':'O39.SI'},
-        {'name':'SATS Ltd.', 'symbol':'S58.SI'}
+        {'name':'SATS Ltd.', 'symbol':'S58.SI'},
+        {'name':'CapitaLand Limited', 'symbol':'C31.SI'}
       ]
     from year_high_low_analysis import Analyst as HL_Analyst
     hl_datum = HL_Analyst(interested_equities, end).get()
