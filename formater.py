@@ -1,4 +1,6 @@
 from datetime import datetime
+import math
+import xml.etree.cElementTree as ET
 
 class Formater():
 
@@ -18,51 +20,51 @@ class Formater():
 
   def _get_heat_color(self, num):# num must be between -1 and 1
     if 1 >= num and num > 0.9:
-      return '#00ff00'
+      return '#00ff0044'
     elif 0.9 >= num and num > 0.8:
-      return '#19ff19'
+      return '#19ff1944'
     elif 0.8 >= num and num > 0.7:
-      return '#33ff33'
+      return '#33ff3344'
     elif 0.7 >= num and num > 0.6:
-      return '#4cff4c'
+      return '#4cff4c44'
     elif 0.6 >= num and num > 0.5:
-      return '#66ff66'
+      return '#66ff6644'
     elif 0.5 >= num and num > 0.4:
-      return '#7fff7f'
+      return '#7fff7f44'
     elif 0.4 >= num and num > 0.3:
-      return '#99ff99'
+      return '#99ff9944'
     elif 0.3 >= num and num > 0.2:
-      return '#b2ffb2'
+      return '#b2ffb244'
     elif 0.2 >= num and num > 0.1:
-      return '#ccffcc'
+      return '#ccffcc44'
     elif 0.1 >= num and num > 0:
-      return '#e5ffe5'
+      return '#e5ffe544'
     elif num == 0:
-      return '#ffffff'
+      return '#ffffff44'
     elif 0 > num and num >= -0.1:
-      return '#ffe5e5'
+      return '#ffe5e544'
     elif -0.1 > num and num >= -0.2:
-      return '#ffcccc'
+      return '#ffcccc44'
     elif -0.2 > num and num >= -0.3:
-      return '#ffb2b2'
+      return '#ffb2b244'
     elif -0.3 > num and num >= -0.4:
-      return '#ff9999'
+      return '#ff999944'
     elif -0.4 > num and num >= -0.5:
-      return '#ff7f7f'
+      return '#ff7f7f44'
     elif -0.5 > num and num >= -0.6:
-      return '#ff6666'
+      return '#ff666644'
     elif -0.6 > num and num >= -0.7:
-      return '#ff4c4c'
+      return '#ff4c4c44'
     elif -0.7 > num and num >= -0.8:
-      return '#ff3333'
+      return '#ff333344'
     elif -0.8 > num and num >= -0.9:
-      return '#ff1919'
+      return '#ff191944'
     elif -0.9 > num and num >= -1:
-      return '#ff0000'
+      return '#ff000044'
 
   def _low_table(self, hl_datum):
     low = """<table style="border-collapse:collapse">
-      <thead><tr style="background-color:#0099ff"><th></th>"""
+      <thead><tr style="background-color:#0099ff44"><th></th>"""
     low += """<th>Name</th>"""
     low += """<th>Day</th>"""
     low += """<th>1 Year</th>"""
@@ -72,9 +74,9 @@ class Formater():
       <tbody>"""
     for i, dictionary in enumerate(hl_datum['low']):
       if i % 2 == 0:
-        background_color = '#47d147'
+        background_color = '#47d14744'
       else:
-        background_color = '#2eb82e'
+        background_color = '#2eb82e44'
       low += """<tr style='background-color:"""+background_color+"""'>"""
       low += """<td>"""+str(i)+"""</td>"""
       low += """<td>"""+dictionary['name']+' ('+dictionary['symbol']+""")</td>"""
@@ -89,7 +91,7 @@ class Formater():
 
   def _high_table(self, hl_datum):
     high = """<table style="border-collapse:collapse">
-      <thead><tr style="background-color:#0099ff"><th></th>"""
+      <thead><tr style="background-color:#0099ff44"><th></th>"""
     high += """<th>Name</th>"""
     high += """<th>Day</th>"""
     high += """<th>1 Year</th>"""
@@ -99,9 +101,9 @@ class Formater():
       <tbody>"""
     for i, dictionary in enumerate(hl_datum['high']):
       if i % 2 == 0:
-        background_color = '#47d147'
+        background_color = '#47d14744'
       else:
-        background_color = '#2eb82e'
+        background_color = '#2eb82e44'
       high += """<tr style='background-color:"""+background_color+"""'>"""
       high += """<td>"""+str(i)+"""</td>"""
       high += """<td>"""+dictionary['name']+' ('+dictionary['symbol']+""")</td>"""
@@ -122,8 +124,8 @@ class Formater():
     for (symbol, name), d_list in hl_datum['historical']['low'].items():
       values = {'day':[], '1_year':[], '2_year':[], '5_year':[]}
       low_historical += """<tr>
-        <td rowspan=5 colspan=1 style="background-color:#0099ff">"""+name+' ('+symbol+""")</td>
-        <td rowspan=1 colspan=1 style="background-color:#00aaff">Date</td>"""
+        <td rowspan=5 colspan=1 style="background-color:#0099ff44">"""+name+' ('+symbol+""")</td>
+        <td rowspan=1 colspan=1 style="background-color:#00aaff44">Date</td>"""
       d_list.sort(key=lambda d: d['current_date'])
       for d in d_list:
         low_historical += """<td rowspan=1 colspan=1 style="background-color:#00aaff">"""+datetime.strftime(d['current_date'],"%Y-%m-%d")+""" ("""+self._get_day_string(d['current_date'])+""")</td>"""
@@ -134,9 +136,9 @@ class Formater():
       low_historical += """</tr>"""
       for i, (k, v_list) in enumerate(values.items()):
         if i % 2 == 0:
-          background_color = '#47d147'
+          background_color = '#47d14744'
         else:
-          background_color = '#2eb82e'
+          background_color = '#2eb82e44'
         low_historical += """<tr style='background-color:"""+background_color+"""'><td rowspan=1 colspan=1>"""+values_display_name[k]+"""</td>"""
         for v in v_list:
           low_historical += """<td rowspan=1 colspan=1>"""+v+"""</td>"""
@@ -153,8 +155,8 @@ class Formater():
     for (symbol, name), d_list in hl_datum['historical']['high'].items():
       values = {'day':[], '1_year':[], '2_year':[], '5_year':[]}
       high_historical += """<tr>
-        <td rowspan=5 colspan=1 style="background-color:#0099ff">"""+name+' ('+symbol+""")</td>
-        <td rowspan=1 colspan=1 style="background-color:#00aaff">Date</td>"""
+        <td rowspan=5 colspan=1 style="background-color:#0099ff44">"""+name+' ('+symbol+""")</td>
+        <td rowspan=1 colspan=1 style="background-color:#00aaff44">Date</td>"""
       d_list.sort(key=lambda d: d['current_date'])
       for d in d_list:
         high_historical += """<td rowspan=1 colspan=1 style="background-color:#00aaff">"""+datetime.strftime(d['current_date'],"%Y-%m-%d")+""" ("""+self._get_day_string(d['current_date'])+""")</td>"""
@@ -165,9 +167,9 @@ class Formater():
       high_historical += """</tr>"""
       for i, (k, v_list) in enumerate(values.items()):
         if i % 2 == 0:
-          background_color = '#47d147'
+          background_color = '#47d14744'
         else:
-          background_color = '#2eb82e'
+          background_color = '#2eb82e44'
         high_historical += """<tr style='background-color:"""+background_color+"""'><td rowspan=1 colspan=1>"""+values_display_name[k]+"""</td>"""
         for v in v_list:
           high_historical += """<td rowspan=1 colspan=1>"""+v+"""</td>"""
@@ -210,28 +212,45 @@ class Formater():
     return financial_stats
 
   def _segmented_linear_regression(self, segmented_datum):
-    segmented = """<table border="1"><thead><tr>"""
-    segmented += """</tr></thead><tbody>"""
+    segmented = ET.Element("table")
+    segmented.set('border', '1')
+    body = ET.SubElement(segmented, "tbody")
     for (ticker, name), datum in segmented_datum.items():
-      segmented += '<tr><td>'+name+' ('+ticker+')</td><td>'
-      segmented += '<table border="1"><thead></tr><td>Overall</td>'
-      for i in range(0,len(datum['segments'])):
-        segmented += '<td>Trend '+str(i)+'</td>'
-      segmented += '</tr></thead><tbody><tr><td>'
-      segmented += str(datum['overall_trend'])
-      segmented += '</td>'
+      row = ET.SubElement(body, "tr")
+      ET.SubElement(row, "td").text = name+" ("+ticker+")"#first column
+      second_column = ET.SubElement(row, "td")
+      inner_trends_table = ET.SubElement(second_column, "table")
+      inner_trends_table.set('border', '1')
+      inner_trends_table_header = ET.SubElement(inner_trends_table, "thead")
+      inner_header_row = ET.SubElement(inner_trends_table_header, "tr")
+      ET.SubElement(inner_header_row, "th").text = "Overall"
+      for i in range(0, len(datum['segments'])):
+        ET.SubElement(inner_header_row, "th").text = "Trend "+str(i)
+      inner_trends_table_body = ET.SubElement(inner_trends_table, "tbody")
+      individual_trend_properties_row = ET.SubElement(inner_trends_table_body, 'tr')
+      overall_cell = ET.SubElement(individual_trend_properties_row, 'td')
+      overall_cell.text = str(datum['overall_trend'])#overall cell
+      if not math.isnan(datum['overall_trend']):
+        if datum['overall_trend'] > 0:
+          overall_cell.set('style','background-color:#00ff0044;')
+        else:
+          overall_cell.set('style','background-color:#ff000044;')
       for segment in datum['segments']:
-        segmented += '<td><table border="1"><tbody>'
+        trend_cell = ET.SubElement(individual_trend_properties_row, 'td')
+        trend_table = ET.SubElement(trend_cell, 'table')
+        trend_table.set('border', '1')
+        trend_table_body = ET.SubElement(trend_table, 'tbody')
         for tag, info in segment.items():
-          segmented += '<tr>'
-          segmented += '<td>'+str(tag)+'</td>'
-          segmented += '<td>'+str(info)+'</td>'
-          segmented += '</tr>'
-        segmented += '</tbody></table></td>'
-      segmented += '</tr></tbody></table>'
-      segmented += '</td></tr>'
-    segmented += """</tbody></table>"""
-    return segmented
+          trend_info_row = ET.SubElement(trend_table_body, 'tr')
+          if tag == 'percentage_slope':
+            if info > 0:
+              trend_table_body.set('style','background-color:#00ff0044;') #green
+            else:
+              trend_table_body.set('style','background-color:#ff000044;') #red
+          ET.SubElement(trend_info_row, 'td').text = str(tag)
+          ET.SubElement(trend_info_row, 'td').text = str(info)
+    return ET.tostring(segmented, encoding='utf8', method='html')
+
 
   def daily_mail(self, hl_datum, correlation_datum, financial_stats_datum, segmented_datum):
     low = self._low_table(hl_datum)
@@ -270,3 +289,23 @@ class Formater():
       #high_historical, 
       correlation)
     return html
+
+if __name__=='__main__':
+    interested_equities = [
+      #{'name':'Singapore Telecommunications Limited', 'symbol':'Z74.SI'},
+      {'name':'Oversea-Chinese Banking Corporation Limited', 'symbol':'O39.SI'},
+      # {'name':'SATS Ltd.', 'symbol':'S58.SI'},
+      # {'name':'CapitaLand Limited', 'symbol':'C31.SI'}
+    ]
+    #################TODO for testing
+    from regression_analysis import Analyst as RA_Analyst
+    from datetime import datetime
+    end = datetime(2020, 6, 11)
+    segmented_datum = RA_Analyst(interested_equities, end).get()
+    formater = Formater()
+    trends = formater._segmented_linear_regression(segmented_datum)
+    file = open('D:\\random\\list_of_promising_investments\\segmented_testing.html', 'w')
+    from bs4 import BeautifulSoup
+    file.write(BeautifulSoup(trends).prettify())
+    file.close()
+    #################TODO for testing

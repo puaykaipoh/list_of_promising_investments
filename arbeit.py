@@ -1,11 +1,12 @@
 from datetime import datetime
+import pytz
 import sys
 
 from mlogging import log
 
 if __name__=='__main__':
   log('INFO', '***Start')
-  end = datetime.utcnow()
+  end = datetime.utcnow().replace(tzinfo=pytz.utc)
   if len(sys.argv) > 1:
     end = datetime.strptime(sys.argv[1], '%Y/%m/%d')
   if end.weekday() in [5,6]:

@@ -2,6 +2,7 @@ from datetime import datetime
 import sys
 
 import numpy as np
+import pytz
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from time import mktime
@@ -46,8 +47,8 @@ class Analyst():
         0.0078125 # TODO this should be configurable; 0.25=2 segments; 0.0078125 = 3 segments for 4 jun 2020 singtel
       ):
         segments.append({
-          'x_start':datetime.strftime(datetime.fromtimestamp(x_start), '%Y-%m-%d %H:%M'),
-          'x_end':datetime.strftime(datetime.fromtimestamp(x_end), '%Y-%m-%d %H:%M'),
+          'x_start':datetime.strftime(datetime.fromtimestamp(x_start).replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Singapore")), '%Y-%m-%d %H:%M'),
+          'x_end':datetime.strftime(datetime.fromtimestamp(x_end).replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Singapore")), '%Y-%m-%d %H:%M'),
           'y_start':y_start,
           'y_end':y_end,
           'coef':coef[0],
