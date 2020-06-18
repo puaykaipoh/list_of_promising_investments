@@ -57,7 +57,7 @@ class Analyst():
           'error':error
         })
         #longer the trend the stronger, the later the stronger, the smaller the error the stronger the trend, percentage slope gives the sign and strength of trend
-        overall_trend += ((x_end - x_start) * x_end * (1/error) * (coef[0]/abs(intercept)))/1000000
+        overall_trend += ((x_end - x_start) * x_end * (1/error) * (coef[0]/abs(intercept)))/1000000000
       self.monthly_datum[(component['symbol'], component['name'])] = {"segments":segments, 'overall_trend':overall_trend}
     self.datum = self.monthly_datum
 
@@ -166,7 +166,7 @@ class Analyst():
 
 if __name__=='__main__':
   from datetime import datetime
-  datum = Analyst([{'symbol':'C31.SI'}], datetime(2020, 4, 4)).get()
+  datum = Analyst([{'name':'Oversea-Chinese Banking Corporation Limited', 'symbol':'O39.SI'}], datetime(2020, 4, 4)).get()
   import pprint
   pp = pprint.PrettyPrinter(indent=4)
   pp.pprint(datum)

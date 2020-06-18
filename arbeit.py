@@ -34,8 +34,11 @@ if __name__=='__main__':
     from regression_analysis import Analyst as RA_Analyst
     segmented_datum = RA_Analyst(interested_equities, end).get()
     log('INFO', 'Finished RA analysis')
+    from seasonal_analysis import Analyst as SA_Analyst
+    seasonal_datum = SA_Analyst(interested_equities, end).get()
+    log('INFO', 'Finished SA analysis')
     from formater import Formater
-    content = Formater().daily_mail(hl_datum, correlation_datum, financial_stats_datum, segmented_datum)
+    content = Formater().daily_mail(hl_datum, correlation_datum, financial_stats_datum, segmented_datum, seasonal_datum)
     if len(sys.argv) == 1:
       from mailer import Mailer
       mfunction = Mailer().send_mail

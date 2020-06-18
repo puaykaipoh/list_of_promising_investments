@@ -251,13 +251,46 @@ class Formater():
           ET.SubElement(trend_info_row, 'td').text = str(info)
     return ET.tostring(segmented, encoding='utf8', method='html')
 
+  def _seasonal_forecast(self, seasonal_datum):
+    season = ET.Element("table")
+    season.set('border', '1')
+    body = ET.SubElement(season, "tbody")
+    for (ticker, name), datum in seasonal_datum.items():
+      row = ET.SubElement(body, "tr")
+      ET.SubElement(row, "td").text = name+" ("+ticker+")"#first column
+      second_column = ET.SubElement(row, "td")
+      inner_table = ET.SubElement(second_column, "table")
+      inner_table.set('border', '1')
+      inner_table_header = ET.SubElement(inner_table, 'thead')
+      inner_table_header_row = ET.SubElement(inner_table_header, "tr")
+      ET.SubElement(inner_table_header_row, "th") # a space for the name of the regressor
+      inner_table_body = ET.SubElement(inner_table, 'tbody')
+      #find smallest set of datetime
+      smallest_set_of_datetime = set()
+      for regression_name, forecast_datum in datum.items():
+        if len(smallest_set_of_datetime) == 0:
+          smallest_set_of_datetime = set(forecast_datum.keys())
+        else:
+          smallest_set_of_datetime = smallest_set_of_datetime.intersection(forecast_datum.keys())
+      smallest_set_of_datetime = sorted(list(smallest_set_of_datetime))
+      for dt in smallest_set_of_datetime:
+        ET.SubElement(inner_table_header_row, "th").text = datetime.strftime(datetime.fromtimestamp(float(dt)), "%Y-%m-%d")
+      for regression_name, forecast_datum in datum.items():
+        regressor_row = ET.SubElement(inner_table_body, "tr")
+        ET.SubElement(regressor_row, 'td').text = regression_name
+        for dt in smallest_set_of_datetime:
+          ET.SubElement(regressor_row, 'td').text = str(forecast_datum[dt])
+    return ET.tostring(season, encoding='utf8', method='html')
 
-  def daily_mail(self, hl_datum, correlation_datum, financial_stats_datum, segmented_datum):
+
+
+  def daily_mail(self, hl_datum, correlation_datum, financial_stats_datum, segmented_datum, seasonal_datum):
     low = self._low_table(hl_datum)
     high = self._high_table(hl_datum)
     trends = self._segmented_linear_regression(segmented_datum)
     #low_historical = self._low_historical(hl_datum)
     #high_historical = self._high_historical(hl_datum)
+    seasons = self._seasonal_forecast(seasonal_datum)
     correlation = self._correlation(correlation_datum)
     financial_stats = self._financial_stats(financial_stats_datum)
     html = """<table>
@@ -268,6 +301,8 @@ class Formater():
         <tr><td style='font-weight:800;font-size:22px'>High</td></tr>
         <tr><td>{}</td></tr>
         <tr><td style='font-weight:800;font-size:22px'>Trends</td></tr>
+        <tr><td>{}</td></tr>
+        <tr><td style='font-weight:800;font-size:22px'>Seasons</td></tr>
         <tr><td>{}</td></tr>
         <tr><td style='font-weight:800;font-size:22px'>Financial Stats</td></tr>
         <tr><td>{}</td></tr>"""
@@ -284,6 +319,7 @@ class Formater():
       low, 
       high, 
       trends, 
+      seasons,
       financial_stats, 
       #low_historical, 
       #high_historical, 
@@ -298,13 +334,13 @@ if __name__=='__main__':
       # {'name':'CapitaLand Limited', 'symbol':'C31.SI'}
     ]
     #################TODO for testing
-    from regression_analysis import Analyst as RA_Analyst
+    from seasonal_analysis import Analyst as SF_Analyst
     from datetime import datetime
     end = datetime(2020, 6, 11)
-    segmented_datum = RA_Analyst(interested_equities, end).get()
+    segmented_datum = SF_Analyst(interested_equities, end).get()
     formater = Formater()
-    trends = formater._segmented_linear_regression(segmented_datum)
-    file = open('D:\\random\\list_of_promising_investments\\segmented_testing.html', 'w')
+    trends = formater._seasonal_forecast(segmented_datum)
+    file = open('D:\\random\\list_of_promising_investments\\seasonal_testing.html', 'w')
     from bs4 import BeautifulSoup
     file.write(BeautifulSoup(trends).prettify())
     file.close()

@@ -103,6 +103,15 @@ class Ticker():
     self.json_data = self._call_url({"period1":start, "period2":end, "interval":'3mo'})#, "includePrePost":True, "events":"div,splits"})
     return self._read_data()
 
+  def get_daily_n_year_data(self, n=5, end=datetime.utcnow()):
+    if end == None:
+      end = datetime.utcnow()
+    start = end - timedelta(days=365 * n)
+    start = int(mktime(start.timetuple()))
+    end = int(mktime(end.timetuple()))
+    self.json_data = self._call_url({"period1":start, "period2":end, "interval":"1d"})
+    return self._read_datum()
+
   def get_daily_year_data(self, end=datetime.utcnow()):
     if end == None:
       end = datetime.utcnow()
