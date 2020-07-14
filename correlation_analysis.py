@@ -57,7 +57,7 @@ class Analyst():
       'X2':self._n_moment(X,n=2),
       'Y':self._n_moment(Y),
       'Y2':self._n_moment(Y, n=2),
-      'XY':mean(map(lambda d: d[0]*d[1], zip(X, Y)))
+      'XY':mean(map(lambda d: 0 if d[0] is None or d[1] is None else d[0]*d[1], zip(X, Y)))
     }
     return (E['XY'] - E['X']*E['Y'])/(((E['X2'] - (E['X']*E['X']))*(E['Y2'] - (E['Y']*E['Y'])))**0.5)
 
