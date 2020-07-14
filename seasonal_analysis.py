@@ -38,7 +38,7 @@ class Analyst():
 
   def holtwinters_predictions(self, X, Y, extrapolated_days=15):
     df = pd.DataFrame({'index':X, 'Y':Y})
-    holtwinters_model = tsa.holtwinters.ExponentialSmoothing(df['Y'], seasonal='mul', seasonal_periods=12).fit()
+    holtwinters_model = tsa.holtwinters.ExponentialSmoothing(df['Y'], seasonal='add', seasonal_periods=12).fit()
     predictions = holtwinters_model.predict(start=len(X), end=len(X)+extrapolated_days)
     base_date = X[-1]
     output = {}
