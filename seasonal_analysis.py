@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 import pandas as pd
+# from tensorflow import keras
 import statsmodels.api as sm#from statsmodels.api.tsa.statespace import SARIMAX
 import statsmodels.tsa as tsa
+import sys
 
 from mlogging import log
 from ticker_data import Ticker
@@ -37,8 +39,13 @@ class Analyst():
     return output
 
   def holtwinters_predictions(self, X, Y, extrapolated_days=15):
+    #make the Y values positive for multiplicative models
+    Y = map(lambda y: sys.float_info.min if y is None or y<=0 else y, Y)
     df = pd.DataFrame({'index':X, 'Y':Y})
-    holtwinters_model = tsa.holtwinters.ExponentialSmoothing(df['Y'], seasonal='add', seasonal_periods=12).fit()
+    try:
+      holtwinters_model = tsa.holtwinters.ExponentialSmoothing(df['Y'], seasonal='mul', seasonal_periods=12).fit()
+    except:
+      holtwinters_model = tsa.holtwinters.ExponentialSmoothing(df['Y'], seasonal='add', seasonal_periods=12).fit()
     predictions = holtwinters_model.predict(start=len(X), end=len(X)+extrapolated_days)
     base_date = X[-1]
     output = {}
@@ -48,6 +55,10 @@ class Analyst():
         base_date = base_date+timedelta(days=1)
       output[str(datetime.timestamp(base_date))] = prediction
     return output
+
+    # def lstmnn_predictions(self, X, Y, extrapolated_days=15):
+    #   lstmnn = keras.models.Sequential()
+      
 
   def get(self):
     return self.datum
