@@ -4,6 +4,7 @@ import gzip
 from html.parser import HTMLParser
 from json import loads
 import locale
+import sys
 from time import mktime, sleep
 import random
 from urllib.parse import urlencode
@@ -59,17 +60,34 @@ class Ticker():
       log('INFO', 'cannot decompress, type: '+str(req.info().get('Content-Encoding')))
     return loads(data)
 
+  def _remove_null(self, l, type):
+    if type == 'max':
+      replacement = sys.float_info.min
+    elif type == 'min':
+      replacement = sys.float_info.max
+    else:
+      replacement = 0
+    r = []
+    for a in l:
+      if a == None:
+        r.append(replacement)
+      else:
+        r.append(a)
+    return r
+
   def _read_data(self): # gets point data
     try:
       prices = self.json_data['chart']['result'][0]['indicators']
       quote = prices['quote'][0]
-      return {'high':max(quote['high']), 
-          'volume':sum(quote['volume']), 
+      return {'high':max(self._remove_null(quote['high'], 'max')), 
+          'volume':sum(self._remove_null(quote['volume'], 'sum')), 
           'close':quote['close'][-1],
           'open':quote['open'][0],
-          'low':min(quote['low']),
+          'low':min(self._remove_null(quote['low'], 'min')),
           'adjclose':prices['adjclose'][0]['adjclose'][-1]}
     except:
+      import traceback
+      log('INFO', '_read_data traceback %s' % traceback.format_exc())
       return None
 
   def _read_datum(self):# gets a range of datum
@@ -95,6 +113,7 @@ class Ticker():
     return self._read_data()
 
   def get_n_year_data(self, n=1, end=datetime.utcnow()):
+    #print('*************get_n_year_data')
     if end == None:
       end = datetime.utcnow()
     start = end - timedelta(days=365 * n)

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import pandas as pd
-# from tensorflow import keras
+#from tensorflow import keras
 import statsmodels.api as sm#from statsmodels.api.tsa.statespace import SARIMAX
 import statsmodels.tsa as tsa
 import sys
@@ -23,6 +23,7 @@ class Analyst():
       self.datum[(component['symbol'], component['name'])] = {
         'SARIMA':self.sarimax_predictions(X, Y),
         'HoltWintersExp':self.holtwinters_predictions(X, Y),
+        # 'LSTMNN':self.lstmnn_predictions(X,Y),
       }
 
   def sarimax_predictions(self, X, Y, extrapolated_days=15):
@@ -56,9 +57,34 @@ class Analyst():
       output[str(datetime.timestamp(base_date))] = prediction
     return output
 
-    # def lstmnn_predictions(self, X, Y, extrapolated_days=15):
-    #   lstmnn = keras.models.Sequential()
-      
+  def lstmnn_predictions(self, X, Y, extrapolated_days=15):
+    time_lag = int(0.08 * len(X)) # take 8% of length
+    #START preparing the data
+    training_datum = []
+    label_datum = []
+    for i in range(0, len(X)-time_lag-extrapolated_days):
+      training_data = []
+      for j in range(i, i+time_lag):
+        training_data.append(X[j].year)
+        training_data.append(X[j].month)
+        training_data.append(X[j].day)
+        training_data.append(X[j].weekday())
+        training_data.append(Y[j])
+      training_datum.append(training_data)
+      label_datum.append(Y[i+time_lag:i+time_lag+extrapolated_days])
+    #END preparing the data
+    lstmnn = keras.models.Sequential([
+      keras.layers.Conv1D(filters=extrapolated_days, kernel_size=time_lag, padding="same", activation="relu", input_shape=(len(training_datum), len(training_datum[0]))),
+      keras.layers.LSTM(int(0.32*len(X)), return_sequences=True),
+      keras.layers.LSTM(int(0.32*len(X)), return_sequences=True),
+      keras.layers.Dense(extrapolated_days, activation='relu'),
+      keras.layers.Dense(extrapolated_days, activation='relu'),
+    ])
+    optimizer = keras.optimizers.SGD(lr=0.000001, momentum=0.9)
+    lstmnn.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizer, metrics=["mae"])
+    #TODO need to normalize
+    lstmnn.fit(np.array([training_datum]), np.array([label_datum]), verbose=1, epochs=2)
+
 
   def get(self):
     return self.datum
