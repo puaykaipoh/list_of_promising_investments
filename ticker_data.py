@@ -24,7 +24,7 @@ class Ticker():
 
   def _call_url(self, params_dict):
     url = "{}/v8/finance/chart/{}?{}".format(self.BASE_URL, self.ticker, urlencode(params_dict))
-    #print(url)
+    print(url)
     counter = 0
     while counter < self.NUMBER_OF_RETRY_CALLS:
       try:
@@ -47,12 +47,12 @@ class Ticker():
         )
         req = urlopen(request)
         counter = self.NUMBER_OF_RETRY_CALLS
+        data = req.read()
       except:
         counter += 1
         import traceback
         log('ERROR', '_call_url retry times '+str(counter+1)+' error:'+traceback.format_exc())
         sleep(3*(random.random()+1.5))
-    data = req.read()
     #print(str(req.info().get('Content-Encoding')))
     try:
       data = gzip.decompress(data)
@@ -77,6 +77,7 @@ class Ticker():
 
   def _read_data(self): # gets point data
     try:
+      print(self.json_data)
       prices = self.json_data['chart']['result'][0]['indicators']
       quote = prices['quote'][0]
       return {'high':max(self._remove_null(quote['high'], 'max')), 
@@ -183,6 +184,7 @@ class Ticker():
           }
         )
         req = urlopen(request)
+        data = req.read()
         counter = self.NUMBER_OF_RETRY_CALLS
       except:
         counter += 1
@@ -191,7 +193,6 @@ class Ticker():
         sleep(3*(random.random()+1.5))
 
     #req = urlopen(url)
-    data = req.read()
     try:
       data = gzip.decompress(data)
       statistics = self.parse_stats(data)
