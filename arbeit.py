@@ -15,13 +15,16 @@ if __name__=='__main__':
   try:
     from sti_components import STIComponents
     interested_equities = STIComponents().get()
-    if len(sys.argv) > 1:#use a smaller set of equities for testing
+    if len(sys.argv) > 1 and '--test' in sys.argv:#use a smaller set of equities for testing
+      log('INFO', 'testing**********************')
       interested_equities = [
         #{'name':'Singapore Telecommunications Limited', 'symbol':'Z74.SI'},
         {'name':'Oversea-Chinese Banking Corporation Limited', 'symbol':'O39.SI'},
         {'name':'SATS Ltd.', 'symbol':'S58.SI'},
         {'name':'CapitaLand Limited', 'symbol':'C31.SI'}
       ]
+    else:
+      log('INFO', 'this is not a test')
     from year_high_low_analysis import Analyst as HL_Analyst
     hl_datum = HL_Analyst(interested_equities, end).get()
     log('INFO', 'Finished HL analysis')
