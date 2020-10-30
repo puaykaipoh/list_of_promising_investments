@@ -11,24 +11,32 @@ class Analyst():
     self.yearly_datum = {}
     log('INFO', 'Getting correlation time series')
     for i, component in enumerate(components):
-      ticker = Ticker(component['symbol'])
-      log('INFO', 'correlation time series for '+component['symbol']+' '+str(i+1)+'/'+str(len(components)))
-      self.yearly_datum[component['symbol']] = list(map(lambda d: {
-        'datetime':d['datetime'], 
-        'value':d['close']}, ticker.get_daily_year_data(end)))
-      if len(self.yearly_datum[component['symbol']]) == 0:
-        raise Exception('correlation analyst cannot get time series for '+component['symbol'])
+      try:
+        ticker = Ticker(component['symbol'])
+        log('INFO', 'correlation time series for '+component['symbol']+' '+str(i+1)+'/'+str(len(components)))
+        self.yearly_datum[component['symbol']] = list(map(lambda d: {
+          'datetime':d['datetime'], 
+          'value':d['close']}, ticker.get_daily_year_data(end)))
+        if len(self.yearly_datum[component['symbol']]) == 0:
+          raise Exception('correlation analyst cannot get time series for '+component['symbol'])
+      except:
+        import traceback
+        log('ERROR', '1 correlation_analysis error %s: %s' % (component, traceback.format_exc()))
     log('INFO', 'Computing correlation')
     for i, x_component in enumerate(components):
-      row = [x_component['name'], x_component['symbol'], {}]
-      for j, y_component in enumerate(components):
-        if i == j:
-          break
-        X, Y = self._line_up_raw_datum(
-          self.yearly_datum[x_component['symbol']],
-          self.yearly_datum[y_component['symbol']])
-        row[2][(y_component['name'], y_component['symbol'])] = self._linear_correlation(X, Y)
-      self.datum.append(row)
+      try:
+        row = [x_component['name'], x_component['symbol'], {}]
+        for j, y_component in enumerate(components):
+          if i == j:
+            break
+          X, Y = self._line_up_raw_datum(
+            self.yearly_datum[x_component['symbol']],
+            self.yearly_datum[y_component['symbol']])
+          row[2][(y_component['name'], y_component['symbol'])] = self._linear_correlation(X, Y)
+        self.datum.append(row)
+      except:
+        import traceback
+        log('ERROR', '2 correlation_analysis error %s: %s' % (component, traceback.format_exc()))
     self.datum.reverse()
     self.datum.pop()
 

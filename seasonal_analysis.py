@@ -15,16 +15,20 @@ class Analyst():
   def __init__(self, components, end):
     log('INFO', 'Getting seasonal time series')
     for i, component in enumerate(components):
-      ticker = Ticker(component['symbol'])
-      log('INFO', 'seasonal time series for '+component['symbol']+' '+str(i+1)+'/'+str(len(components)))
-      ticker_datum = ticker.get_daily_n_year_data(n=4, end=end)
-      X = list(map(lambda x: x['datetime'], ticker_datum))
-      Y = list(map(lambda x: x['close'], ticker_datum))
-      self.datum[(component['symbol'], component['name'])] = {
-        'SARIMA':self.sarimax_predictions(X, Y),
-        'HoltWintersExp':self.holtwinters_predictions(X, Y),
-        # 'LSTMNN':self.lstmnn_predictions(X,Y),
-      }
+      try:
+        ticker = Ticker(component['symbol'])
+        log('INFO', 'seasonal time series for '+component['symbol']+' '+str(i+1)+'/'+str(len(components)))
+        ticker_datum = ticker.get_daily_n_year_data(n=4, end=end)
+        X = list(map(lambda x: x['datetime'], ticker_datum))
+        Y = list(map(lambda x: x['close'], ticker_datum))
+        self.datum[(component['symbol'], component['name'])] = {
+          'SARIMA':self.sarimax_predictions(X, Y),
+          'HoltWintersExp':self.holtwinters_predictions(X, Y),
+          # 'LSTMNN':self.lstmnn_predictions(X,Y),
+        }
+      except:
+        import traceback
+        log('ERROR', 'seasonal_analysis %s: %s' % (component, traceback.format_exc()))
 
   def sarimax_predictions(self, X, Y, extrapolated_days=15):
     df = pd.DataFrame({'index':X, 'Y':Y})

@@ -18,47 +18,51 @@ class Analyst():
     self.monthly_datum = {}
     log('INFO', 'Getting regression time series')
     for i, component in enumerate(components):
-      ticker = Ticker(component['symbol'])
-      log('INFO', 'regression time series for '+component['symbol']+' '+str(i+1)+'/'+str(len(components)))
-      ticker_datum = ticker.get_hourly_month_data(end)
-      segments = []
-      overall_trend = 0
-      X = np.array(list(map(lambda d: 
-          mktime(d['datetime'].timetuple())
-        ,ticker_datum)))
-      Y = np.array(list(map(lambda d: 
-          d['close']
-        ,ticker_datum)))
-      #start remove all the None
-      prev = X[0] #
-      for i in range(1, len(X)):
-        if X[i] == None:
-          X[i] = prev
-        else:
-          prev = X[i]
-      prev = Y[0]
-      for i in range(1, len(Y)):
-        if Y[i] == None:
-          Y[i] = prev
-        else:
-          prev = Y[i]
-      #end remove ll the None
-      for x_start, x_end, y_start, y_end, coef, intercept, error in self._segmented_least_squares(X, Y,
-        0.0078125 # TODO this should be configurable; 0.25=2 segments; 0.0078125 = 3 segments for 4 jun 2020 singtel
-      ):
-        segments.append({
-          'x_start':datetime.strftime(datetime.fromtimestamp(x_start).replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Singapore")), '%Y-%m-%d %H:%M'),
-          'x_end':datetime.strftime(datetime.fromtimestamp(x_end).replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Singapore")), '%Y-%m-%d %H:%M'),
-          'y_start':y_start,
-          'y_end':y_end,
-          'coef':coef[0],
-          'intercept':intercept,
-          'percentage_slope':coef[0]/abs(intercept),
-          'error':error
-        })
-        #longer the trend the stronger, the later the stronger, the smaller the error the stronger the trend, percentage slope gives the sign and strength of trend
-        overall_trend += ((x_end - x_start) * x_end * (1/error) * (coef[0]/abs(intercept)))/1000000000
-      self.monthly_datum[(component['symbol'], component['name'])] = {"segments":segments, 'overall_trend':overall_trend}
+      try:
+        ticker = Ticker(component['symbol'])
+        log('INFO', 'regression time series for '+component['symbol']+' '+str(i+1)+'/'+str(len(components)))
+        ticker_datum = ticker.get_hourly_month_data(end)
+        segments = []
+        overall_trend = 0
+        X = np.array(list(map(lambda d: 
+            mktime(d['datetime'].timetuple())
+          ,ticker_datum)))
+        Y = np.array(list(map(lambda d: 
+            d['close']
+          ,ticker_datum)))
+        #start remove all the None
+        prev = X[0] #
+        for i in range(1, len(X)):
+          if X[i] == None:
+            X[i] = prev
+          else:
+            prev = X[i]
+        prev = Y[0]
+        for i in range(1, len(Y)):
+          if Y[i] == None:
+            Y[i] = prev
+          else:
+            prev = Y[i]
+        #end remove ll the None
+        for x_start, x_end, y_start, y_end, coef, intercept, error in self._segmented_least_squares(X, Y,
+          0.0078125 # TODO this should be configurable; 0.25=2 segments; 0.0078125 = 3 segments for 4 jun 2020 singtel
+        ):
+          segments.append({
+            'x_start':datetime.strftime(datetime.fromtimestamp(x_start).replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Singapore")), '%Y-%m-%d %H:%M'),
+            'x_end':datetime.strftime(datetime.fromtimestamp(x_end).replace(tzinfo=pytz.utc).astimezone(pytz.timezone("Asia/Singapore")), '%Y-%m-%d %H:%M'),
+            'y_start':y_start,
+            'y_end':y_end,
+            'coef':coef[0],
+            'intercept':intercept,
+            'percentage_slope':coef[0]/abs(intercept),
+            'error':error
+          })
+          #longer the trend the stronger, the later the stronger, the smaller the error the stronger the trend, percentage slope gives the sign and strength of trend
+          overall_trend += ((x_end - x_start) * x_end * (1/error) * (coef[0]/abs(intercept)))/1000000000
+        self.monthly_datum[(component['symbol'], component['name'])] = {"segments":segments, 'overall_trend':overall_trend}
+      except:
+        import traceback
+        log('ERROR', 'regression_analysis %s: %s' % (component, traceback.format_exc()))
     self.datum = self.monthly_datum
 
   def get(self):
