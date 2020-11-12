@@ -42,7 +42,7 @@ if __name__=='__main__':
     log('INFO', 'Finished SA analysis')
     from formater import Formater
     content = Formater().daily_mail(hl_datum, correlation_datum, financial_stats_datum, segmented_datum, seasonal_datum)
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 1 or '--test' not in sys.argv:
       from mailer import Mailer
       mfunction = Mailer().send_mail
       margs = [["puaykaipoh@gmail.com", "charissatanweiyi@gmail.com"], 
