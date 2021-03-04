@@ -2,6 +2,8 @@ from datetime import datetime
 import math
 import xml.etree.cElementTree as ET
 
+from mlogging import log
+
 class Formater():
 
   def _format_number(self, num):
@@ -179,6 +181,21 @@ class Formater():
     return high_historical
 
   def _correlation(self, correlation_datum):
+    try:
+      correlation_datum[0][2]
+    except:
+      log('WARNING', 'correlation_datum[0][2] is error %s' % correlation_datum)
+      return ""
+    try:
+      d[0][0]
+    except:
+      log('WARNING', 'd[0][0] is error %s' % d)
+      return ""
+    try:
+      d[0][1]
+    except:
+      log('WARNING', 'd[0][1] is error %s' % d)
+      return ""
     correlation = """<table style="border-collapse:collapse">
       <thead></thead><tbody><tr><td></td>"""
     header_keys = list(map(lambda d: (d[0][0], d[0][1]), correlation_datum[0][2].items()))
