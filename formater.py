@@ -182,19 +182,9 @@ class Formater():
 
   def _correlation(self, correlation_datum):
     try:
-      correlation_datum[0][2]
+      correlation_datum[0][2] #TODO this is the error correlation_datum is []
     except:
       log('WARNING', 'correlation_datum[0][2] is error %s' % correlation_datum)
-      return ""
-    try:
-      d[0][0]
-    except:
-      log('WARNING', 'd[0][0] is error %s' % d)
-      return ""
-    try:
-      d[0][1]
-    except:
-      log('WARNING', 'd[0][1] is error %s' % d)
       return ""
     correlation = """<table style="border-collapse:collapse">
       <thead></thead><tbody><tr><td></td>"""
