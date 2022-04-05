@@ -16,7 +16,7 @@ if __name__=='__main__':
     from sti_components import STIComponents
     interested_equities = STIComponents().get()
     if len(sys.argv) > 1 and '--test' in sys.argv:#use a smaller set of equities for testing
-      log('INFO', 'testing**********************')
+      log('INFO', 'testing*********************')
       interested_equities = [
         #{'name':'Singapore Telecommunications Limited', 'symbol':'Z74.SI'},
         {'name':'Oversea-Chinese Banking Corporation Limited', 'symbol':'O39.SI'},
