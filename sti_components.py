@@ -143,15 +143,24 @@ class STIComponents():
                 soup = BeautifulSoup(data.decode())
                 table = soup.find('table', id='stock-list-analyst-target-price')
                 cells = table.find_all('td', {'class':'text-primary'})
-                name_bracket_tickers = list(map(lambda cell: cell.find_all('a')[0].contents[0], cells))
+                ######old code 202204052031
+                # name_bracket_tickers = list(map(lambda cell: cell.find_all('a')[0].contents[0], cells))
+                # data = []
+                # for names_bracket_ticker in name_bracket_tickers:
+                #     print('****', names_bracket_ticker)
+                #     matches = matches = re.match("(.+)+\((\w+.SI)\)", names_bracket_ticker)
+                #     if matches:
+                #         groups = matches.groups()
+                #         data.append({'symbol':groups[1], 'name':groups[0]})
+                #     else:
+                #         log('WARNING', f'sti_component no match {names_bracket_ticker}')
+                #######old code 202204052031
                 data = []
-                for names_bracket_ticker in name_bracket_tickers:
-                    matches = matches = re.match("(.+)+\((\w+.SI)\)", names_bracket_ticker)
-                    if matches:
-                        groups = matches.groups()
-                        data.append({'symbol':groups[1], 'name':groups[0]})
-                    else:
-                        log('WARNING', f'sti_component no match {names_bracket_ticker}')
+                for cell in cells:
+                    contents = cell.find_all('a')[0].contents
+                    name = contents[0]
+                    symbol = re.match("\(SGX:(\w+)\)", contents[2].contents[0]).groups()[0]+'.SI'
+                    data.append({'symbol':symbol, 'name':name})
                 return data
               except:
                 counter += 1
@@ -167,8 +176,8 @@ class STIComponents():
 
 
 if __name__=='__main__':
-    data = STIComponents().get()
-    #data = STIComponents()._get_from_sginvestors()
+    #data = STIComponents().get()
+    data = STIComponents()._get_from_sginvestors()
     print(len(data))
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
