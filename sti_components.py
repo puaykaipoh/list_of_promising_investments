@@ -176,8 +176,8 @@ class STIComponents():
 
 
 if __name__=='__main__':
-    #data = STIComponents().get()
-    data = STIComponents()._get_from_sginvestors()
+    data = STIComponents().get()
+    #data = STIComponents()._get_from_sginvestors()
     print(len(data))
     import pprint
     pp = pprint.PrettyPrinter(indent=4)

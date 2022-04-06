@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import pytz
 
 from mlogging import log
 from ticker_data import Ticker
@@ -86,4 +87,6 @@ class Analyst():
 if __name__=='__main__':
   from sti_components import STIComponents
   components = STIComponents().get()
-  print(Analyst(components).get())
+  end = datetime.utcnow().replace(tzinfo=pytz.utc)
+  print(len(components))
+  print(Analyst(components, end).get())
