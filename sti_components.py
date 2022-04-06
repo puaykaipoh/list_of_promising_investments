@@ -140,7 +140,7 @@ class STIComponents():
                     data = gzip.decompress(data)
                 except:
                     log('INFO', 'cannot decompress, type: '+str(req.info().get('Content-Encoding')))
-                soup = BeautifulSoup(data.decode())
+                soup = BeautifulSoup(data.decode(), features="lxml")
                 table = soup.find('table', id='stock-list-analyst-target-price')
                 cells = table.find_all('td', {'class':'text-primary'})
                 ######old code 202204052031
@@ -155,6 +155,7 @@ class STIComponents():
                 #     else:
                 #         log('WARNING', f'sti_component no match {names_bracket_ticker}')
                 #######old code 202204052031
+                log('INFO', f"sti_components found {len(cells)} cells")
                 data = []
                 for cell in cells:
                     contents = cell.find_all('a')[0].contents
