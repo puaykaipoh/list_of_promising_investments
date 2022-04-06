@@ -16,6 +16,7 @@ kiwisolver==1.2.0
 korean-lunar-calendar==0.2.1
 LunarCalendar==0.0.9
 lunardate==0.2.0
+lxml==4.5.2
 matplotlib==3.2.2
 numpy==1.14.5
 pandas==0.25.3
