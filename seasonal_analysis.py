@@ -84,12 +84,12 @@ class Analyst():
       label_datum.append(Y[i+time_lag:i+time_lag+extrapolated_days])
     #END preparing the data
     lstmnn = keras.models.Sequential([
-        keras.layers.BatchNormalization(),
+        #keras.layers.BatchNormalization(),
         keras.layers.Conv1D(filters=extrapolated_days, kernel_size=time_lag, padding="same", activation="relu"),# input_shape=(len(training_datum[0]), len(training_datum[1]))),
         keras.layers.LSTM(int(0.32*len(X)), return_sequences=True),
         keras.layers.LSTM(int(0.32*len(X)), return_sequences=True),
         keras.layers.Dense(extrapolated_days, activation='relu'),
-        keras.layers.Dense(extrapolated_days, activation='relu'),
+        keras.layers.Dense(extrapolated_days, activation='linear'),
     ])
     optimizer = keras.optimizers.SGD(learning_rate=0.0001, momentum=0.9)
     lstmnn.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizer, metrics=["mae"])
@@ -157,12 +157,12 @@ if __name__=='__main__':
       label_datum.append(Y[i+time_lag:i+time_lag+extrapolated_days])
     #END preparing the data
     lstmnn = keras.models.Sequential([
-        keras.layers.BatchNormalization(),
+        #keras.layers.BatchNormalization(),
         keras.layers.Conv1D(filters=extrapolated_days, kernel_size=time_lag, padding="same", activation="relu"),# input_shape=(len(training_datum[0]), len(training_datum[1]))),
         keras.layers.LSTM(int(0.32*len(X)), return_sequences=True),
         keras.layers.LSTM(int(0.32*len(X)), return_sequences=True),
         keras.layers.Dense(extrapolated_days, activation='relu'),
-        keras.layers.Dense(extrapolated_days, activation='relu'),
+        keras.layers.Dense(extrapolated_days, activation='linear'),
     ])
     optimizer = keras.optimizers.SGD(learning_rate=0.000001, momentum=0.9)
     lstmnn.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizer, metrics=["mae"])
@@ -178,6 +178,7 @@ if __name__=='__main__':
     #     Y[-1]
     # ])
     results = lstmnn.predict(np.array([training_datum[-2:-1]]))[-1].tolist()[-1]#lstmnn.predict(np.array([training_datum[-1*(extrapolated_days+1):-1]]))
+    print(results)
     #unnormalize predictions
     predictions = list(map(lambda y: (y*largest_diff_from_zero)+average,results))
     base_date = X[-1]
