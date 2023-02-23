@@ -95,7 +95,7 @@ class Analyst():
     lstmnn.compile(loss=keras.losses.binary_crossentropy, optimizer=optimizer, metrics=["mae"])
     #TODO need to normalize
     #add dummy dimension for Conv1D
-    lstmnn.fit(np.array([training_datum]), np.array([label_datum]), verbose=1, epochs=64, batch_size=len(training_datum))
+    lstmnn.fit(np.array([training_datum]), np.array([label_datum]), verbose=1, epochs=32, batch_size=len(training_datum)) # 64 seems too long?
     results = lstmnn.predict(np.array([training_datum[-2:-1]]))[-1].tolist()[-1]#lstmnn.predict(np.array([training_datum[-1*(extrapolated_days+1):-1]]))
     #unnormalize predictions
     predictions = list(map(lambda y: (y*largest_diff_from_zero)+average,results))

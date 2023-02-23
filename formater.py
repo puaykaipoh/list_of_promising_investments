@@ -71,6 +71,8 @@ class Formater():
     low += """<th>Day</th>"""
     low += """<th>1 Year</th>"""
     low += """<th>2 Year</th>"""
+    low += """<th>3 Year</th>"""
+    low += """<th>4 Year</th>"""
     low += """<th>5 Year</th>"""
     low += """</tr></thead>
       <tbody>"""
@@ -85,6 +87,8 @@ class Formater():
       low += """<td>"""+self._format_number(dictionary['day'])+"""</td>"""
       low += """<td>"""+self._format_number(dictionary['1_year'])+"""</td>"""
       low += """<td>"""+self._format_number(dictionary['2_year'])+"""</td>"""
+      low += """<td>"""+self._format_number(dictionary['3_year'])+"""</td>"""
+      low += """<td>"""+self._format_number(dictionary['4_year'])+"""</td>"""
       low += """<td>"""+self._format_number(dictionary['5_year'])+"""</td>"""
       low += """</tr>"""
     low += """</tbody>
@@ -98,6 +102,8 @@ class Formater():
     high += """<th>Day</th>"""
     high += """<th>1 Year</th>"""
     high += """<th>2 Year</th>"""
+    high += """<th>3 Year</th>"""
+    high += """<th>4 Year</th>"""
     high += """<th>5 Year</th>"""
     high += """</tr></thead>
       <tbody>"""
@@ -112,6 +118,8 @@ class Formater():
       high += """<td>"""+self._format_number(dictionary['day'])+"""</td>"""
       high += """<td>"""+self._format_number(dictionary['1_year'])+"""</td>"""
       high += """<td>"""+self._format_number(dictionary['2_year'])+"""</td>"""
+      high += """<td>"""+self._format_number(dictionary['3_year'])+"""</td>"""
+      high += """<td>"""+self._format_number(dictionary['4_year'])+"""</td>"""
       high += """<td>"""+self._format_number(dictionary['5_year'])+"""</td>"""
       high += """</tr>"""
     high += """</tbody>
@@ -119,12 +127,12 @@ class Formater():
     return high
 
   def _low_historical(self, hl_datum):
-    values_display_name = {'day':'Day', '1_year':'1 Year', '2_year':'2 Year', '5_year':'5 Year'}
+    values_display_name = {'day':'Day', '1_year':'1 Year', '2_year':'2 Year','3_year':'3 Year','4_year':'4 Year', '5_year':'5 Year'}
     low_historical = """<table style="border-collapse:collapse">
       <thead></thead>"""
     low_historical += """<tbody>"""
     for (symbol, name), d_list in hl_datum['historical']['low'].items():
-      values = {'day':[], '1_year':[], '2_year':[], '5_year':[]}
+      values = {'day':[], '1_year':[], '2_year':[], '3_year':[], '4_year':[], '5_year':[]}
       low_historical += """<tr>
         <td rowspan=5 colspan=1 style="background-color:#0099ff44">"""+name+' ('+symbol+""")</td>
         <td rowspan=1 colspan=1 style="background-color:#00aaff44">Date</td>"""
@@ -134,6 +142,8 @@ class Formater():
         values['day'].append(self._format_number(d['day']))
         values['1_year'].append(self._format_number(d['1_year']))
         values['2_year'].append(self._format_number(d['2_year']))
+        values['3_year'].append(self._format_number(d['3_year']))
+        values['4_year'].append(self._format_number(d['4_year']))
         values['5_year'].append(self._format_number(d['5_year']))
       low_historical += """</tr>"""
       for i, (k, v_list) in enumerate(values.items()):
@@ -150,12 +160,12 @@ class Formater():
     return low_historical
 
   def _high_historical(self, hl_datum):
-    values_display_name = {'day':'Day', '1_year':'1 Year', '2_year':'2 Year', '5_year':'5 Year'}
+    values_display_name = {'day':'Day', '1_year':'1 Year', '2_year':'2 Year','3_year':'3 Year','4_year':'4 Year', '5_year':'5 Year'}
     high_historical = """<table style="border-collapse:collapse">
       <thead></thead>"""
     high_historical += """<tbody>"""
     for (symbol, name), d_list in hl_datum['historical']['high'].items():
-      values = {'day':[], '1_year':[], '2_year':[], '5_year':[]}
+      values = {'day':[], '1_year':[], '2_year':[],'3_year':[], '4_year':[], '5_year':[]}
       high_historical += """<tr>
         <td rowspan=5 colspan=1 style="background-color:#0099ff44">"""+name+' ('+symbol+""")</td>
         <td rowspan=1 colspan=1 style="background-color:#00aaff44">Date</td>"""
@@ -165,6 +175,8 @@ class Formater():
         values['day'].append(self._format_number(d['day']))
         values['1_year'].append(self._format_number(d['1_year']))
         values['2_year'].append(self._format_number(d['2_year']))
+        values['3_year'].append(self._format_number(d['3_year']))
+        values['4_year'].append(self._format_number(d['4_year']))
         values['5_year'].append(self._format_number(d['5_year']))
       high_historical += """</tr>"""
       for i, (k, v_list) in enumerate(values.items()):

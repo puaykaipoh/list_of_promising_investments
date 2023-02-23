@@ -21,8 +21,8 @@ class Analyst():
       except:
         import traceback
         log('ERROR', '%s HL error : %s' % (dictionary, traceback.format_exc()))
-    self.datum['high'].sort(key=lambda d:(100*100*d['5_year'])+(100*d['2_year'])+(d['1_year']))
-    self.datum['low'].sort(key=lambda d:(100*100*d['5_year'])+(100*d['2_year'])+(d['1_year']))
+    self.datum['high'].sort(key=lambda d:(100*100*100*100*100*d['5_year'])+(100*100*100*100*d['4_year'])+(100*100*100*d['3_year'])+(100*d['2_year'])+(d['1_year']))
+    self.datum['low'].sort(key=lambda d:(100*100*100*100*100*d['5_year'])+(100*100*100*100*d['4_year'])+(100*100*100*d['3_year'])+(100*d['2_year'])+(d['1_year']))
     # historical = {'high':{}, 'low':{}}
     # log('INFO', 'HISTORICAL*********************')
     # for i, dictionary in enumerate(components):
@@ -60,6 +60,14 @@ class Analyst():
     if two_year_data == None:
       log('ERROR', 'did not get 2 year data')
       return None, None
+    three_year_data = ticker.get_n_year_data(n=3, end=end)
+    if three_year_data == None:
+      log('ERROR', 'did not get 3 year data')
+      return None, None
+    four_year_data = ticker.get_n_year_data(n=4, end=end)
+    if four_year_data == None:
+      log('ERROR', 'did not get 4 year data')
+      return None, None
     five_year_data = ticker.get_n_year_data(n=5, end=end)
     if five_year_data == None:
       log('ERROR', 'did not get 5 year data')
@@ -70,12 +78,16 @@ class Analyst():
       'day':day_data['high'],
       '1_year':(one_year_data['high']-day_data['high'])/one_year_data['high'],
       '2_year':(two_year_data['high']-day_data['high'])/two_year_data['high'],
+      '3_year':(three_year_data['high']-day_data['high'])/three_year_data['high'],
+      '4_year':(four_year_data['high']-day_data['high'])/four_year_data['high'],
       '5_year':(five_year_data['high']-day_data['high'])/five_year_data['high'],
     })
     low_d.update({
       'day':day_data['low'],
       '1_year':(day_data['low']-one_year_data['low'])/one_year_data['low'],
       '2_year':(day_data['low']-two_year_data['low'])/two_year_data['low'],
+      '3_year':(three_year_data['low']-day_data['low'])/three_year_data['low'],
+      '4_year':(four_year_data['low']-day_data['low'])/four_year_data['low'],
       '5_year':(day_data['low']-five_year_data['low'])/five_year_data['low'],
     })
     return low_d, high_d
@@ -86,7 +98,7 @@ class Analyst():
 
 if __name__=='__main__':
   from sti_components import STIComponents
-  components = STIComponents().get()
+  components = STIComponents().get()[0:3]
   end = datetime.utcnow().replace(tzinfo=pytz.utc)
   print(len(components))
   print(Analyst(components, end).get())
